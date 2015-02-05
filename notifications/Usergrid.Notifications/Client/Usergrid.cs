@@ -28,13 +28,21 @@ using System.Net.Http.Headers;
 
 namespace Usergrid.Notifications.Client
 {
- 
-    /// <summary>
-    /// Usergrid client 
-    /// </summary>
-
     public class Usergrid : IUsergridHttpClient, IUsergridClient
     {
+        //TODO: change me to your server url
+        const string SERVER_URL = "https://api.usergrid.com";
+        //TODO: change me to your org
+        const string ORG_NAME = "rwalsh";
+        //TODO: change me to your app or sandbox
+        const string APP_NAME = "sandbox";
+        //TODO: change me to your notifier name
+        const string NOTIFIER_NAME = "winphone";
+        //TODO: change me to your user
+        const string USER_ID = "testUser";
+        //TODO: change me to your password
+        const string PASSWORD = "Password11";
+
         private string appUrl;
         private string token;
         private HttpClient client;
@@ -48,14 +56,14 @@ namespace Usergrid.Notifications.Client
         /// <param name="org"></param>
         /// <param name="app"></param>
         /// <param name="channel"></param>
-        internal Usergrid(string serverUrl, string org, string app, string userId, string password,string notifier)
+        internal Usergrid()
         {
-            string serverUrlWithSlash = serverUrl.EndsWith("/", StringComparison.CurrentCulture) ? serverUrl : serverUrl + "/";
-            this.appUrl = String.Format("{0}{1}/{2}/", serverUrlWithSlash, org, app);
+            string serverUrlWithSlash = SERVER_URL.EndsWith("/", StringComparison.CurrentCulture) ? SERVER_URL : SERVER_URL + "/";
+            this.appUrl = String.Format("{0}{1}/{2}/", serverUrlWithSlash, ORG_NAME, APP_NAME);
             this.managementUrl = serverUrlWithSlash + "management/";
             this.client = new HttpClient();
-            Authenticate(userId, password, false).ContinueWith(task => {
-                this.push = new PushClient(this, userId, notifier);
+            Authenticate(USER_ID, PASSWORD, false).ContinueWith(task => {
+                this.push = new PushClient(this, USER_ID, NOTIFIER_NAME);
             });
         }
 

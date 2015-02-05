@@ -42,21 +42,9 @@ namespace Usergrid.Notifications
         private string password;
         public MainPage()
         {
-            this.InitializeComponent();
-            //TODO: change me to your server
-            serverUrl = "https://usergrid-push.example.com";
-            //TODO: change me to your org
-            org = "ugvalidate";
-            //TODO: change me to your app
-            app = "sandbox";
-            //TODO: change me to your notifier name
-            notifier = "winphone";
-            //TODO: change me to your user
-            user = "mobileuser";
-            //TODO: change me to your password
-            password = "******";
+            this.InitializeComponent();           
             this.NavigationCacheMode = NavigationCacheMode.Required;
-            usergrid = new Client.Usergrid(serverUrl, org, app, user, password, notifier);
+            usergrid = new Client.Usergrid();
 
         }
 
