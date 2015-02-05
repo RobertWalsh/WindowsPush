@@ -45,3 +45,5 @@ Temporary Items
 #Nuget Packages
 /notifications/Usergrid.Notifications/packages/
 !/notifications/Usergrid.Notifications/packages/repositories.config
+*bin
+*obj
