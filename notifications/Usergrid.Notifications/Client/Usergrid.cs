@@ -30,8 +30,6 @@ namespace Usergrid.Notifications.Client
 {
     public class Usergrid : IUsergridHttpClient, IUsergridClient
     {
-        //TODO: change me to your server url
-        const string SERVER_URL = "https://api.usergrid.com";
         //TODO: change me to your org
         const string ORG_NAME = "rwalsh";
         //TODO: change me to your app or sandbox
@@ -43,6 +41,8 @@ namespace Usergrid.Notifications.Client
         //TODO: change me to your password
         const string PASSWORD = "Password11";
 
+
+        const string APIGEE_SERVER_URL = "https://api.usergrid.com";
         private string appUrl;
         private string token;
         private HttpClient client;
@@ -52,13 +52,9 @@ namespace Usergrid.Notifications.Client
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="serverUrl"></param>
-        /// <param name="org"></param>
-        /// <param name="app"></param>
-        /// <param name="channel"></param>
         internal Usergrid()
         {
-            string serverUrlWithSlash = SERVER_URL.EndsWith("/", StringComparison.CurrentCulture) ? SERVER_URL : SERVER_URL + "/";
+            string serverUrlWithSlash = APIGEE_SERVER_URL.EndsWith("/", StringComparison.CurrentCulture) ? APIGEE_SERVER_URL : APIGEE_SERVER_URL + "/";
             this.appUrl = String.Format("{0}{1}/{2}/", serverUrlWithSlash, ORG_NAME, APP_NAME);
             this.managementUrl = serverUrlWithSlash + "management/";
             this.client = new HttpClient();

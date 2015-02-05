@@ -34,12 +34,7 @@ namespace Usergrid.Notifications
     public sealed partial class MainPage : Page
     {
         private IUsergridClient usergrid;
-        private string serverUrl;
-        private string org;
-        private string app;
-        private string notifier;
-        private string user;
-        private string password;
+        
         public MainPage()
         {
             this.InitializeComponent();           
