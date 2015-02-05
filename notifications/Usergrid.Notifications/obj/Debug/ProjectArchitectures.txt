@@ -1,0 +1,1 @@
+C:\Users\Robert Walsh\Documents\GitHub\WindowsPush\notifications\Usergrid.Notifications\Usergrid.Notifications.csproj;neutral
