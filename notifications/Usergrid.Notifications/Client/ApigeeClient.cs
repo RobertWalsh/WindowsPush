@@ -28,42 +28,39 @@ using System.Net.Http.Headers;
 
 namespace Usergrid.Notifications.Client
 {
-    public class Usergrid : IUsergridHttpClient, IUsergridClient
+    public class ApigeeClient
     {
         //TODO: change me to your org
         const string ORG_NAME = "rwalsh";
         //TODO: change me to your app or sandbox
         const string APP_NAME = "sandbox";
         //TODO: change me to your notifier name
-        const string NOTIFIER_NAME = "winphone";
+        const string NOTIFIER_NAME = "winphonenotifier";
         //TODO: change me to your user
         const string USER_ID = "testUser";
         //TODO: change me to your password
         const string PASSWORD = "Password11";
 
-
-        const string APIGEE_SERVER_URL = "https://api.usergrid.com";
+        const string APIGEE_SERVER_URL = "https://api.usergrid.com/";
         private string appUrl;
         private string token;
         private HttpClient client;
-        private IPushClient push;
-        private string managementUrl;
+        private PushClient push;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        internal Usergrid()
+        internal ApigeeClient()
         {
-            string serverUrlWithSlash = APIGEE_SERVER_URL.EndsWith("/", StringComparison.CurrentCulture) ? APIGEE_SERVER_URL : APIGEE_SERVER_URL + "/";
-            this.appUrl = String.Format("{0}{1}/{2}/", serverUrlWithSlash, ORG_NAME, APP_NAME);
-            this.managementUrl = serverUrlWithSlash + "management/";
+            this.appUrl = String.Format("{0}{1}/{2}/", APIGEE_SERVER_URL, ORG_NAME, APP_NAME);
             this.client = new HttpClient();
-            Authenticate(USER_ID, PASSWORD, false).ContinueWith(task => {
-                this.push = new PushClient(this, USER_ID, NOTIFIER_NAME);
-            });
+            if (USER_ID.Length > 0 && PASSWORD.Length > 0)
+            {
+                this.loginUser(USER_ID, PASSWORD, false).ContinueWith(task =>
+                {
+                    this.push = new PushClient(this, USER_ID, NOTIFIER_NAME);
+                });
+            }
         }
 
-        public async Task Authenticate(string user, string password, bool isManagement)
+        public async Task loginUser(string user, string password, bool isManagement)
         {
             var jsonObject = new JObject();
             jsonObject.Add("username", user);
@@ -95,7 +92,7 @@ namespace Usergrid.Notifications.Client
 
         public async Task<EntityResponse> SendAsync(HttpMethod method, string url, object obj, bool useManagementUrl)
         {
-            HttpRequestMessage message = new HttpRequestMessage(method, (useManagementUrl ? this.managementUrl : this.appUrl) + url);
+            HttpRequestMessage message = new HttpRequestMessage(method, this.appUrl + url);
             if (obj != null)
             {
                 message.Content = getJsonBody(obj);
@@ -105,7 +102,7 @@ namespace Usergrid.Notifications.Client
             return await EntityResponse.Parse(response);
         }
    
-        public IPushClient Push
+        public PushClient Push
         {
             get { return push; }
         }
@@ -114,7 +111,6 @@ namespace Usergrid.Notifications.Client
         {
             return new StringContent(JsonConvert.SerializeObject(jsonObject));
         }
-
 
         public Exception LastException
         {

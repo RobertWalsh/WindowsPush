@@ -14,7 +14,7 @@ The application allows you to send and receive both badge and toast notification
 
 - In Visual Studio, open `Usergrid.Notifications.sln` which is located within the folder `/notifications/Usergrid.Notifications/`.
 
-- Once you have the project open, navigate to and open `Client/Usergrid.cs`.  You will need edit the constant string values located near the top of the file to appropriate values.  (`SERVER_URL`,`ORG_NAME`,`APP_NAME` ect)
+- Once you have the project open, navigate to and open `Client/ApigeeClient.cs`.  You will need edit the constant string values located near the top of the file to appropriate values.  (`SERVER_URL`,`ORG_NAME`,`APP_NAME` ect)
 
   - You may or may not need to add a user to Apigee BaaS to fulfill all the constant string requirements.
 
@@ -28,6 +28,6 @@ The application allows you to send and receive both badge and toast notification
 
 - Once you have these go to your app services page and create a notifier.
   
-- Once the notifier has been created make sure that you have edited the constant string `NOTIFIER_NAME` in `Client/Usergrid.cs` to the name you had for the notifier you just created.
+- Once the notifier has been created make sure that you have edited the constant string `NOTIFIER_NAME` in `Client/ApigeeClient.cs` to the name you had for the notifier you just created.
 
 - Once all of this is done, in VS select `Build->Build Solution` and you should be able to then run you application.

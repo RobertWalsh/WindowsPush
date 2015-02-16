@@ -87,13 +87,12 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Client\EntityResponse.cs" />
-    <Compile Include="Client\IUsergridClient.cs" />
     <Compile Include="Client\PushClient.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Client\Usergrid.cs" />
+    <Compile Include="Client\ApigeeClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

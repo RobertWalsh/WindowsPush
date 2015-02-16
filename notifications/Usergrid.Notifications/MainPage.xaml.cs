@@ -33,13 +33,13 @@ namespace Usergrid.Notifications
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private IUsergridClient usergrid;
+        private Client.ApigeeClient usergrid;
         
         public MainPage()
         {
             this.InitializeComponent();           
             this.NavigationCacheMode = NavigationCacheMode.Required;
-            usergrid = new Client.Usergrid();
+            usergrid = new Client.ApigeeClient();
 
         }
 

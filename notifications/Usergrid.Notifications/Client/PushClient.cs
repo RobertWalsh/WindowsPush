@@ -29,23 +29,28 @@ using Windows.Storage;
 
 namespace Usergrid.Notifications.Client
 {
-    public class PushClient : IPushClient
+    public class PushClient
     {
         const string DEVICE_KEY = "currentDeviceId";
-        private IUsergridHttpClient usergrid;
+
+        private ApigeeClient apigeeClient;
         private ApplicationDataContainer settings;
         private PushNotificationChannel channel;
-        private string userId;
 
-        public PushClient(IUsergridHttpClient usergrid,string userId, string notifier)
+        private string userId;
+        public string notifierName;
+        public Guid deviceID;
+        public Exception lastException;
+
+        public PushClient(ApigeeClient apigeeClient, string userId, string notifierName)
         {
-            this.usergrid = usergrid;
+            this.apigeeClient = apigeeClient;
             this.settings = ApplicationData.Current.LocalSettings;
-            this.Notifier = notifier;
+            this.notifierName = notifierName;
             this.userId = userId;
             this.init().ContinueWith(t =>
                   {
-                      LastException = t.Exception;
+                      this.lastException = t.Exception;
                   }  
                 );
         }
@@ -53,35 +58,37 @@ namespace Usergrid.Notifications.Client
 
         public async Task<bool> SendToast(string message)
         {
-            if (DeviceId == null)
+            if (this.deviceID == null)
             {
                 throw new Exception("Please call PushClient.RegisterDevice first.");
             }
+
             var jsonObject = new JObject();
             var payloads = new JObject();
             var payload = new JObject();
             payload.Add("toast", new JValue(message));
-            payloads.Add(Notifier, payload);
+            payloads.Add(this.notifierName, payload);
             jsonObject.Add("payloads", payloads);
             jsonObject.Add("debug", true);
-            var jsonResponse = await usergrid.SendAsync(HttpMethod.Post, String.Format("users/{1}/devices/{0}/notifications", this.DeviceId,userId), jsonObject);
+            var jsonResponse = await this.apigeeClient.SendAsync(HttpMethod.Post, String.Format("users/{1}/devices/{0}/notifications", this.deviceID,userId), jsonObject);
             return jsonResponse.StatusIsOk;
         }
 
         public async Task<bool> SendBadge<T>(T message)
         {
-            if (DeviceId == null)
+            if (this.deviceID == null)
             {
                 throw new Exception("Please call PushClient.RegisterDevice first.");
             }
+
             var jsonObject = new JObject();
             var payloads = new JObject();
             var payload = new JObject();
             payload.Add("badge", new JValue(message));
-            payloads.Add(Notifier, payload);
+            payloads.Add(this.notifierName, payload);
             jsonObject.Add("payloads", payloads);
             jsonObject.Add("debug", true);
-            var jsonResponse = await usergrid.SendAsync(HttpMethod.Post, String.Format("users/{1}/devices/{0}/notifications", this.DeviceId,userId), jsonObject);
+            var jsonResponse = await this.apigeeClient.SendAsync(HttpMethod.Post, String.Format("users/{1}/devices/{0}/notifications", this.deviceID,userId), jsonObject);
             return jsonResponse.StatusIsOk;
         }
 
@@ -92,19 +99,19 @@ namespace Usergrid.Notifications.Client
             {
                 Guid uuid = await registerDevice(true);
                 settings.Values.Add(DEVICE_KEY, uuid);
-                this.DeviceId = uuid;
+                this.deviceID = uuid;
             }
             else
             {
                 object tempId;
                 settings.Values.TryGetValue(DEVICE_KEY, out tempId);
-                this.DeviceId = Guid.Parse(tempId.ToString());
-                var device = await GetDevice(DeviceId);
+                this.deviceID = Guid.Parse(tempId.ToString());
+                var device = await GetDevice(this.deviceID);
                 if (device == null)
                 {
                     Guid uuid = await registerDevice(true);
                     settings.Values[DEVICE_KEY] = uuid;
-                    this.DeviceId = uuid;
+                    this.deviceID = uuid;
                 }
                 else
                 {
@@ -116,7 +123,7 @@ namespace Usergrid.Notifications.Client
        
         private async Task<JToken> GetDevice(Guid deviceId)
         {
-            var jsonResponse = await usergrid.SendAsync(HttpMethod.Get, "users/"+userId+"/devices/" + deviceId, null);
+            var jsonResponse = await apigeeClient.SendAsync(HttpMethod.Get, "users/"+userId+"/devices/" + deviceId, null);
 
             if (jsonResponse.StatusIsOk)
             {
@@ -129,10 +136,10 @@ namespace Usergrid.Notifications.Client
         private async Task<Guid> registerDevice(bool isNew)
         {
             JObject obj = new JObject();
-            obj.Add(Notifier + ".notifier.id", new JValue(channel.Uri));
-            var jsonResponse = await usergrid.SendAsync(
+            obj.Add(this.notifierName + ".notifier.id", new JValue(channel.Uri));
+            var jsonResponse = await this.apigeeClient.SendAsync(
                 (isNew ? HttpMethod.Post : HttpMethod.Put), 
-                "users/"+userId+"/devices/" +   (isNew ? "" : this.DeviceId.ToString()), 
+                "users/"+userId+"/devices/" +   (isNew ? "" : this.deviceID.ToString()), 
                 obj
                 );
             
@@ -146,10 +153,5 @@ namespace Usergrid.Notifications.Client
                 return Guid.Empty; 
             }
         }
-
-        public string Notifier { get; set; }
-        public Guid DeviceId { get; set; }
-        public Exception LastException { get; set; }
-
     }
 }
